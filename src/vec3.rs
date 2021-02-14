@@ -23,52 +23,51 @@ impl fmt::Display for Colour {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3<T> {
-	x: T,
-	y: T,
-	z: T
+    x: T,
+    y: T,
+    z: T,
 }
 
 impl<T> Vec3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
         Vec3 { x, y, z }
-	}
+    }
 }
 
 impl Vec3<f64> {
-    pub fn x(&self) -> f64{
-		self.x
-	}
+    pub fn x(&self) -> f64 {
+        self.x
+    }
 
-	pub fn y(&self) -> f64{
-		self.y
-	}
+    pub fn y(&self) -> f64 {
+        self.y
+    }
 
-	pub fn z(&self) -> f64{
-		self.z
-	}
-	pub fn length(&self) -> f64 {
+    pub fn z(&self) -> f64 {
+        self.z
+    }
+    pub fn length(&self) -> f64 {
         self.length_sqrd().sqrt()
     }
     pub fn length_sqrd(&self) -> f64 {
         (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
     }
 
-	pub fn unit(&self) -> Self {
+    pub fn unit(&self) -> Self {
         self.div(self.length())
     }
 
-	pub fn dot(&self, other: &Self) -> f64 {
+    pub fn dot(&self, other: &Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-	pub fn cross(&self, rhs: &Vec3<f64>) -> Vec3<f64> {
-		Vec3 {
-			x: self.y * rhs.z - self.z * rhs.y,
-			y: self.z * rhs.x - self.x * rhs.z,
-			z: self.x * rhs.y - self.y * rhs.x,
-		}
-	}
-
+    pub fn cross(&self, rhs: &Vec3<f64>) -> Vec3<f64> {
+        Vec3 {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
 }
 
 impl AddAssign for Vec3<f64> {
