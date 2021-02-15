@@ -1,10 +1,11 @@
+use crate::utils::clamp;
 use rand::{thread_rng, Rng};
 use std::fmt;
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
-const COLOUR_UTILITY_FLOAT: f64 = 255.999;
+const COLOUR_UTILITY_FLOAT: f64 = 256.0;
 
 pub type Point3D = Vec3<f64>;
 pub type Colour = Vec3<f64>;
@@ -18,6 +19,20 @@ impl fmt::Display for Colour {
             (COLOUR_UTILITY_FLOAT * self.y) as i16,
             (COLOUR_UTILITY_FLOAT * self.z) as i16
         )
+    }
+}
+
+impl Colour {
+    pub fn write_colour(&self, sample_per_pixel: i16) -> Colour {
+        let scale = 1.0 / (sample_per_pixel as f64);
+
+        let scaled_colour: Colour = *self * scale;
+
+        Colour {
+            x: clamp(scaled_colour.x(), 0.0, 0.999),
+            y: clamp(scaled_colour.y(), 0.0, 0.999),
+            z: clamp(scaled_colour.z(), 0.0, 0.999),
+        }
     }
 }
 
@@ -66,6 +81,25 @@ impl Vec3<f64> {
             x: self.y * rhs.z - self.z * rhs.y,
             y: self.z * rhs.x - self.x * rhs.z,
             z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
+
+    pub fn random_from_range(min: f64, max: f64) -> Self {
+        let mut rng = thread_rng();
+
+        Vec3 {
+            x: rng.gen_range(min..=max),
+            y: rng.gen_range(min..=max),
+            z: rng.gen_range(min..=max),
+        }
+    }
+    pub fn random() -> Self {
+        let mut rng = thread_rng();
+
+        Vec3 {
+            x: rng.gen_range(0.0..=1.0),
+            y: rng.gen_range(0.0..=1.0),
+            z: rng.gen_range(0.0..=1.0),
         }
     }
 }

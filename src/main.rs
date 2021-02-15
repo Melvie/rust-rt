@@ -1,6 +1,8 @@
-use rust_rt::objects::{Object, Sphere, SceneObjects, Hit};
+use rand::Rng;
+use rust_rt::camera::Camera;
+use rust_rt::objects::{Hit, Object, SceneObjects, Sphere};
 use rust_rt::ray::Ray;
-use rust_rt::vec3::{Colour, Point3D, Vec3};
+use rust_rt::vec3::{Colour, Point3D};
 
 pub fn ray_colour(ray: &Ray, world: &SceneObjects) -> Colour {
     if let Some(hit_record) = world.hit(ray, 0.0, std::f64::INFINITY) {
@@ -18,35 +20,37 @@ fn main() {
     const SAMPLES_PER_PIXEL: i16 = 100;
     const MAX_DEPTH: i16 = 50;
 
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * ASPECT_RATIO;
-    let focal_length = 1.0;
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let origin = Point3D::new(0.0, 0.0, 0.0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
-
     let mut world = SceneObjects::new();
 
-    world.add(Object::Sphere(Sphere::new(Point3D::new(0.0, -100.5, -1.0), 100.0)));
 
-    world.add(Object::Sphere(Sphere::new(Point3D::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(0.0, 0.0, -1.0),
+        0.5,
+    )));
+
+
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(0.0, -100.5, -1.0),
+        100.0,
+    )));
+
+    let camera = Camera::new(ASPECT_RATIO, 2.0, 1.0);
 
     println!("P3\n{:?} {:?}\n255", IMG_WIDTH, IMG_HEIGHT);
+    let mut rng = rand::thread_rng();
 
     for j in (0..IMG_HEIGHT).rev() {
         eprintln!("Scanning lines remaining:{:?}", j);
         for i in 0..IMG_WIDTH {
-            let u: f64 = i as f64 / (IMG_WIDTH - 1) as f64;
-            let v: f64 = j as f64 / (IMG_HEIGHT - 1) as f64;
+            let mut pixel_colour = Colour::new(0.0, 0.0, 0.0);
+            for _x in 0..SAMPLES_PER_PIXEL {
+                let u: f64 = (i as f64 + rng.gen::<f64>()) / (IMG_WIDTH - 1) as f64;
+                let v: f64 = (j as f64 + rng.gen::<f64>()) / (IMG_HEIGHT - 1) as f64;
 
-            let ray = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical
-            );
-
-            println!("{:}", ray_colour(&ray, &world));
+                let ray = camera.get_ray(u, v);
+                pixel_colour += ray_colour(&ray, &world);
+            }
+            println!("{:}", pixel_colour.write_colour(SAMPLES_PER_PIXEL));
         }
         eprint!("{}[2J", 27 as char);
     }
