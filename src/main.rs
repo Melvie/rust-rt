@@ -2,11 +2,23 @@ use rand::Rng;
 use rust_rt::camera::Camera;
 use rust_rt::objects::{Hit, Object, SceneObjects, Sphere};
 use rust_rt::ray::Ray;
+use rust_rt::utils::random_unit_sphere;
 use rust_rt::vec3::{Colour, Point3D};
 
-pub fn ray_colour(ray: &Ray, world: &SceneObjects) -> Colour {
+pub fn ray_colour(ray: &Ray, world: &SceneObjects, depth: i16) -> Colour {
+    if depth <= 0 {
+        return Colour::new(0.0, 0.0, 0.0);
+    }
+
     if let Some(hit_record) = world.hit(ray, 0.0, std::f64::INFINITY) {
-        return 0.5 * (hit_record.normal() + Colour::new(1.0, 1.0, 1.0));
+        let target = hit_record.point() + hit_record.normal() + random_unit_sphere();
+
+        return 0.5
+            * ray_colour(
+                &Ray::new(hit_record.point(), target - hit_record.point()),
+                world,
+                depth - 1,
+            );
     }
     let unit_direction = ray.direction().unit();
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -22,12 +34,10 @@ fn main() {
 
     let mut world = SceneObjects::new();
 
-
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(0.0, 0.0, -1.0),
         0.5,
     )));
-
 
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(0.0, -100.5, -1.0),
@@ -48,7 +58,7 @@ fn main() {
                 let v: f64 = (j as f64 + rng.gen::<f64>()) / (IMG_HEIGHT - 1) as f64;
 
                 let ray = camera.get_ray(u, v);
-                pixel_colour += ray_colour(&ray, &world);
+                pixel_colour += ray_colour(&ray, &world, MAX_DEPTH);
             }
             println!("{:}", pixel_colour.write_colour(SAMPLES_PER_PIXEL));
         }
