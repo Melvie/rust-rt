@@ -29,9 +29,9 @@ impl Colour {
         let scaled_colour: Colour = *self * scale;
 
         Colour {
-            x: clamp(scaled_colour.x(), 0.0, 0.999),
-            y: clamp(scaled_colour.y(), 0.0, 0.999),
-            z: clamp(scaled_colour.z(), 0.0, 0.999),
+            x: clamp(scaled_colour.x().sqrt(), 0.0, 0.999),
+            y: clamp(scaled_colour.y().sqrt(), 0.0, 0.999),
+            z: clamp(scaled_colour.z().sqrt(), 0.0, 0.999),
         }
     }
 }
