@@ -1,29 +1,13 @@
 use rand::Rng;
 use rust_rt::camera::Camera;
-use rust_rt::objects::{Hit, Object, SceneObjects, Sphere};
-use rust_rt::ray::Ray;
-use rust_rt::utils::random_unit_sphere;
+use rust_rt::objects::{Object, SceneObjects, Sphere};
 use rust_rt::vec3::{Colour, Point3D};
+use rust_rt::scene::Scene;
+use rayon::prelude::*;
+use indicatif::{ParallelProgressIterator,  ProgressBar};
+use rayon::iter::ParallelIterator;
 
-pub fn ray_colour(ray: &Ray, world: &SceneObjects, depth: i16) -> Colour {
-    if depth <= 0 {
-        return Colour::new(0.0, 0.0, 0.0);
-    }
 
-    if let Some(hit_record) = world.hit(ray, 0.0, std::f64::INFINITY) {
-        let target = hit_record.point() + hit_record.normal() + random_unit_sphere();
-
-        return 0.5
-            * ray_colour(
-                &Ray::new(hit_record.point(), target - hit_record.point()),
-                world,
-                depth - 1,
-            );
-    }
-    let unit_direction = ray.direction().unit();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
-}
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -44,24 +28,12 @@ fn main() {
         100.0,
     )));
 
-    let camera = Camera::new(ASPECT_RATIO, 2.0, 1.0);
+    let scene = Scene::new(world, Camera::new(ASPECT_RATIO, 2.0, 1.0));
 
-    println!("P3\n{:?} {:?}\n255", IMG_WIDTH, IMG_HEIGHT);
-    let mut rng = rand::thread_rng();
+    let bar = ProgressBar::new(SAMPLES_PER_PIXEL as u64);
 
-    for j in (0..IMG_HEIGHT).rev() {
-        eprintln!("Scanning lines remaining:{:?}", j);
-        for i in 0..IMG_WIDTH {
-            let mut pixel_colour = Colour::new(0.0, 0.0, 0.0);
-            for _x in 0..SAMPLES_PER_PIXEL {
-                let u: f64 = (i as f64 + rng.gen::<f64>()) / (IMG_WIDTH - 1) as f64;
-                let v: f64 = (j as f64 + rng.gen::<f64>()) / (IMG_HEIGHT - 1) as f64;
+    let things:Vec<Vec<Colour>> = (0..SAMPLES_PER_PIXEL).into_par_iter().progress_with(bar).map(|_| {
+        scene.render(MAX_DEPTH, IMG_WIDTH, IMG_HEIGHT)
+    }).collect();
 
-                let ray = camera.get_ray(u, v);
-                pixel_colour += ray_colour(&ray, &world, MAX_DEPTH);
-            }
-            println!("{:}", pixel_colour.write_colour(SAMPLES_PER_PIXEL));
-        }
-        eprint!("{}[2J", 27 as char);
-    }
 }
