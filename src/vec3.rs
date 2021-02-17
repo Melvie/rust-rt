@@ -1,9 +1,8 @@
 use crate::utils::clamp;
 use rand::{thread_rng, Rng};
 use std::fmt;
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
-};
+use std::iter::Sum;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 const COLOUR_UTILITY_FLOAT: f64 = 256.0;
 
@@ -220,5 +219,38 @@ impl Div<f64> for Vec3<f64> {
     type Output = Self;
     fn div(self, rhs: f64) -> Self {
         self * (1.0 / rhs)
+    }
+}
+
+impl Sum for Vec3<f64> {
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        iter.fold(
+            Self {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            |acc, other| acc + other,
+        )
+    }
+}
+
+pub trait Transpose {
+    fn transpose(self) -> Self;
+}
+
+impl Transpose for Vec<Vec<Vec3<f64>>> {
+    fn transpose(self) -> Self {
+        assert!(!self.is_empty());
+        (0..self[0].len())
+            .map(|i| {
+                self.iter()
+                    .map(|inner| inner[i].clone())
+                    .collect::<Vec<Vec3<f64>>>()
+            })
+            .collect()
     }
 }

@@ -1,13 +1,16 @@
-use rand::Rng;
+use indicatif::{ParallelProgressIterator, ProgressBar};
+use rayon::iter::ParallelIterator;
+use rayon::prelude::*;
 use rust_rt::camera::Camera;
 use rust_rt::objects::{Object, SceneObjects, Sphere};
-use rust_rt::vec3::{Colour, Point3D};
 use rust_rt::scene::Scene;
-use rayon::prelude::*;
-use indicatif::{ParallelProgressIterator,  ProgressBar};
-use rayon::iter::ParallelIterator;
+use rust_rt::vec3::{Colour, Point3D, Transpose, Vec3};
 
-
+fn write_render(rendered_scene: &Vec<Colour>) {
+    for render in rendered_scene {
+        println!("{:}", render);
+    }
+}
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -32,8 +35,16 @@ fn main() {
 
     let bar = ProgressBar::new(SAMPLES_PER_PIXEL as u64);
 
-    let things:Vec<Vec<Colour>> = (0..SAMPLES_PER_PIXEL).into_par_iter().progress_with(bar).map(|_| {
-        scene.render(MAX_DEPTH, IMG_WIDTH, IMG_HEIGHT)
-    }).collect();
+    let rendered_scene: Vec<Vec3<f64>> = (0..SAMPLES_PER_PIXEL)
+        .into_par_iter()
+        .progress_with(bar)
+        .map(|_| scene.render(MAX_DEPTH, IMG_WIDTH, IMG_HEIGHT))
+        .collect::<Vec<Vec<Colour>>>()
+        .transpose()
+        .into_iter()
+        .map(|x| x.into_iter().sum::<Colour>())
+        .collect();
 
+    println!("P3\n{:?} {:?}\n255", IMG_WIDTH, IMG_HEIGHT);
+    write_render(&rendered_scene);
 }
