@@ -6,9 +6,9 @@ use rust_rt::objects::{Object, SceneObjects, Sphere};
 use rust_rt::scene::Scene;
 use rust_rt::vec3::{Colour, Point3D, Transpose, Vec3};
 
-fn write_render(rendered_scene: &Vec<Colour>) {
+fn write_render(rendered_scene: &Vec<Colour>, samples_per_pxl: i16) {
     for render in rendered_scene {
-        println!("{:}", render);
+        println!("{:}", render.write_colour(samples_per_pxl));
     }
 }
 
@@ -46,5 +46,5 @@ fn main() {
         .collect();
 
     println!("P3\n{:?} {:?}\n255", IMG_WIDTH, IMG_HEIGHT);
-    write_render(&rendered_scene);
+    write_render(&rendered_scene, SAMPLES_PER_PIXEL);
 }

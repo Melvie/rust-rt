@@ -23,8 +23,8 @@ impl Scene {
 
         pixels
             .map(|(i, j)| {
-                let u = (i as f64 + rng.gen::<f64>()) / (img_width - 1) as f64;
-                let v = (j as f64 + rng.gen::<f64>()) / (img_height - 1) as f64;
+                let u = ((i as f64) + rng.gen::<f64>()) / (img_width - 1) as f64;
+                let v = ((j as f64) + rng.gen::<f64>()) / (img_height - 1) as f64;
 
                 let ray = self.camera.get_ray(u, v);
                 ray_colour(&ray, &self.world, max_depth)
