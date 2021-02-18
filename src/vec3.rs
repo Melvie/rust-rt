@@ -254,3 +254,36 @@ impl Transpose for Vec<Vec<Vec3<f64>>> {
             .collect()
     }
 }
+
+#[cfg(test)]
+mod vec3_tests {
+    use super::*;
+    #[test]
+    fn test_transpose() {
+        let test = Vec3::new(0.0, 1.0, 2.0);
+        let t2 = Vec3::new(1.0, 2.0, 3.0);
+        let t3 = Vec3::new(2.0, 3.0, 4.0);
+        let test_vec = vec![vec![test, t2, t3], vec![test, t2, t3]];
+
+        assert_eq!(
+            vec![vec![test, test], vec![t2, t2], vec![t3, t3]],
+            test_vec.clone().transpose()
+        )
+    }
+    #[test]
+    fn test_transpose_sum() {
+        let test = Vec3::new(0.0, 1.0, 2.0);
+        let t2 = Vec3::new(1.0, 2.0, 3.0);
+        let t3 = Vec3::new(2.0, 3.0, 4.0);
+        let test_vec = vec![vec![test, test, test], vec![test, test, test]];
+
+        assert_eq!(
+            vec![test, t2],
+            test_vec
+                .clone()
+                .into_iter()
+                .map(|x| x.into_iter().sum::<Colour>())
+                .collect::<Vec<Vec3<f64>>>()
+        )
+    }
+}
