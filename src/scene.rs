@@ -38,7 +38,7 @@ fn ray_colour(ray: &Ray, world: &SceneObjects, depth: i16) -> Colour {
         return Colour::new(0.0, 0.0, 0.0);
     }
 
-    if let Some(hit_record) = world.hit(ray, 0.0, std::f64::INFINITY) {
+    if let Some(hit_record) = world.hit(ray, 0.001, std::f64::INFINITY) {
         let target = hit_record.point() + hit_record.normal() + random_unit_sphere();
 
         return 0.5
