@@ -60,9 +60,11 @@ impl Vec3<f64> {
     pub fn z(&self) -> f64 {
         self.z
     }
+
     pub fn length(&self) -> f64 {
         self.length_sqrd().sqrt()
     }
+
     pub fn length_sqrd(&self) -> f64 {
         (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
     }
@@ -92,6 +94,7 @@ impl Vec3<f64> {
             z: rng.gen_range(min..=max),
         }
     }
+
     pub fn random() -> Self {
         let mut rng = thread_rng();
 
