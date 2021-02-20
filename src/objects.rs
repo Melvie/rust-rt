@@ -1,6 +1,6 @@
-use crate::material::{Materials, Material};
+use crate::material::{Material, Materials};
 use crate::ray::Ray;
-use crate::vec3::{Point3D, Vec3, Colour};
+use crate::vec3::{Colour, Point3D, Vec3};
 
 pub trait Hit {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -11,7 +11,7 @@ pub struct HitRecord<'a> {
     normal: Vec3<f64>,
     t: f64,
     front_face: bool,
-    material: &'a Materials
+    material: &'a Materials,
 }
 
 impl<'a> HitRecord<'a> {
@@ -21,7 +21,7 @@ impl<'a> HitRecord<'a> {
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
-            material: material
+            material: material,
         }
     }
 
