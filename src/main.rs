@@ -23,8 +23,8 @@ fn main() {
     let mut world = SceneObjects::new();
     let material_ground = Materials::Lambertian(Lambertian::new(Colour::new(0.8, 0.8, 0.0)));
     let material_center = Materials::Lambertian(Lambertian::new(Colour::new(0.7, 0.3, 0.3)));
-    let material_left = Materials::Metal(Metal::new(Colour::new(0.8, 0.8, 0.8)));
-    let material_right = Materials::Metal(Metal::new(Colour::new(0.8, 0.6, 0.2)));
+    let material_left = Materials::Metal(Metal::new(Colour::new(0.8, 0.8, 0.8), 0.3));
+    let material_right = Materials::Metal(Metal::new(Colour::new(0.8, 0.6, 0.2), 1.0));
 
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(0.0, -100.5, -1.0),
