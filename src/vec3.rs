@@ -104,6 +104,16 @@ impl Vec3<f64> {
             z: rng.gen_range(0.0..=1.0),
         }
     }
+
+    pub fn near_zero(&self) -> bool {
+        static ALMOST_ZERO: f64 = 1e-8;
+
+        self.x.abs() < ALMOST_ZERO && self.y.abs() < ALMOST_ZERO && self.z.abs() < ALMOST_ZERO
+    }
+
+    pub fn reflect(&self, norm: &Vec3<f64>) -> Vec3<f64> {
+        *self - (2.0 * self.dot(norm) * *norm)
+    }
 }
 
 impl AddAssign for Vec3<f64> {
