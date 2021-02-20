@@ -2,6 +2,7 @@ use indicatif::{ParallelProgressIterator, ProgressBar};
 use rayon::iter::ParallelIterator;
 use rayon::prelude::*;
 use rust_rt::camera::Camera;
+use rust_rt::material::{Lambertian, Materials, Metal};
 use rust_rt::objects::{Object, SceneObjects, Sphere};
 use rust_rt::scene::Scene;
 use rust_rt::vec3::{Colour, Point3D, Transpose, Vec3};
@@ -20,15 +21,33 @@ fn main() {
     const MAX_DEPTH: i16 = 50;
 
     let mut world = SceneObjects::new();
-
-    world.add(Object::Sphere(Sphere::new(
-        Point3D::new(0.0, 0.0, -1.0),
-        0.5,
-    )));
+    let material_ground = Materials::Lambertian(Lambertian::new(Colour::new(0.8, 0.8, 0.0)));
+    let material_center = Materials::Lambertian(Lambertian::new(Colour::new(0.7, 0.3, 0.3)));
+    let material_left = Materials::Metal(Metal::new(Colour::new(0.8, 0.8, 0.8)));
+    let material_right = Materials::Metal(Metal::new(Colour::new(0.8, 0.6, 0.2)));
 
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(0.0, -100.5, -1.0),
         100.0,
+        material_ground,
+    )));
+
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
     )));
 
     let scene = Scene::new(world, Camera::new(ASPECT_RATIO, 2.0, 1.0));

@@ -15,7 +15,7 @@ pub struct Lambertian {
     albedo: Colour,
 }
 
-enum Materials {
+pub enum Materials {
     Lambertian(Lambertian),
     Metal(Metal),
 }

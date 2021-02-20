@@ -1,39 +1,41 @@
+use crate::material::{Materials, Material};
 use crate::ray::Ray;
-use crate::vec3::{Point3D, Vec3};
+use crate::vec3::{Point3D, Vec3, Colour};
 
 pub trait Hit {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-#[derive(Clone)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     point: Point3D,
     normal: Vec3<f64>,
     t: f64,
     front_face: bool,
+    material: &'a Materials
 }
 
-impl HitRecord {
-    pub fn new() -> HitRecord {
+impl<'a> HitRecord<'a> {
+    pub fn new(material: &Materials) -> HitRecord {
         HitRecord {
             point: Point3D::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
+            material: material
         }
     }
 
-    pub fn set_point(mut self, point: Vec3<f64>) -> HitRecord {
+    pub fn set_point(mut self, point: Vec3<f64>) -> HitRecord<'a> {
         self.point = point;
         self
     }
 
-    pub fn set_time(mut self, time: f64) -> HitRecord {
+    pub fn set_time(mut self, time: f64) -> HitRecord<'a> {
         self.t = time;
         self
     }
 
-    pub fn set_face_normal(mut self, ray: &Ray, outward_normal: &Vec3<f64>) -> HitRecord {
+    pub fn set_face_normal(mut self, ray: &Ray, outward_normal: &Vec3<f64>) -> HitRecord<'a> {
         self.front_face = ray.direction().dot(outward_normal) < 0.0;
         self.normal = if self.front_face {
             *outward_normal
@@ -51,6 +53,10 @@ impl HitRecord {
     pub fn point(&self) -> Point3D {
         self.point
     }
+
+    pub fn scatter_on_mat(&self, ray: &Ray) -> Option<(Ray, Colour)> {
+        self.material.scatter(&self, ray)
+    }
 }
 
 pub enum Object {
@@ -67,16 +73,21 @@ impl Hit for Object {
     }
 }
 
-#[derive(Clone)]
 pub struct Sphere {
     center: Point3D,
     radius: f64,
+    material: Materials,
 }
 
 impl Sphere {
-    pub fn new(center: Point3D, radius: f64) -> Self {
-        Sphere { center, radius }
+    pub fn new(center: Point3D, radius: f64, material: Materials) -> Self {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
+
     pub fn center(&self) -> Point3D {
         self.center
     }
@@ -111,7 +122,7 @@ impl Hit for Sphere {
 
         let outward_normal: Vec3<f64> = (ray.at(root) - self.center) / self.radius;
 
-        let hit_record = HitRecord::new()
+        let hit_record = HitRecord::new(&self.material)
             .set_time(root)
             .set_point(ray.at(root))
             .set_face_normal(ray, &outward_normal);

@@ -1,7 +1,6 @@
 use crate::camera::Camera;
 use crate::objects::{Hit, SceneObjects};
 use crate::ray::Ray;
-use crate::utils::random_unit_sphere;
 use crate::vec3::Colour;
 use rand::Rng;
 
@@ -39,14 +38,11 @@ fn ray_colour(ray: &Ray, world: &SceneObjects, depth: i16) -> Colour {
     }
 
     if let Some(hit_record) = world.hit(ray, 0.001, std::f64::INFINITY) {
-        let target = hit_record.point() + hit_record.normal() + random_unit_sphere();
+        if let Some((scattered_ray, attenuation)) = hit_record.scatter_on_mat(ray) {
+            return attenuation * ray_colour(&scattered_ray, world, depth - 1);
+        }
 
-        return 0.5
-            * ray_colour(
-                &Ray::new(hit_record.point(), target - hit_record.point()),
-                world,
-                depth - 1,
-            );
+        return Colour::new(0.0, 0.0, 0.0);
     }
     let unit_direction = ray.direction().unit();
     let t = 0.5 * (unit_direction.y() + 1.0);
