@@ -114,6 +114,16 @@ impl Vec3<f64> {
     pub fn reflect(&self, norm: &Vec3<f64>) -> Vec3<f64> {
         *self - (2.0 * self.dot(norm) * *norm)
     }
+
+    pub fn refract(&self, normal: &Vec3<f64>, refraction_ratio: f64) -> Vec3<f64> {
+        let cost_theta = -self.dot(normal).min(1.0);
+
+        let perpendicular_ray: Vec3<f64> = refraction_ratio * (*self + cost_theta * (*normal));
+
+        let parrallel_ray = -(*normal) * (1.0 - perpendicular_ray.length_sqrd()).abs().sqrt();
+
+        perpendicular_ray + parrallel_ray
+    }
 }
 
 impl AddAssign for Vec3<f64> {

@@ -57,6 +57,10 @@ impl<'a> HitRecord<'a> {
     pub fn scatter_on_mat(&self, ray: &Ray) -> Option<(Ray, Colour)> {
         self.material.scatter(&self, ray)
     }
+
+    pub fn front_face(&self) -> bool {
+        self.front_face
+    }
 }
 
 pub enum Object {

@@ -16,9 +16,14 @@ pub struct Lambertian {
     albedo: Colour,
 }
 
+pub struct Dielectric {
+    refraction_index: f64,
+}
+
 pub enum Materials {
     Lambertian(Lambertian),
     Metal(Metal),
+    Dielectric(Dielectric),
 }
 
 impl Material for Materials {
@@ -26,6 +31,7 @@ impl Material for Materials {
         match self {
             Materials::Lambertian(lambertian) => lambertian.scatter(hit_record, ray),
             Materials::Metal(metal) => metal.scatter(hit_record, ray),
+            Materials::Dielectric(dielectric) => dielectric.scatter(hit_record, ray),
         }
     }
 }
@@ -68,5 +74,25 @@ impl Material for Metal {
         } else {
             None
         }
+    }
+}
+
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Self {
+        Dielectric { refraction_index }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, hit_record: &HitRecord, ray: &Ray) -> Option<(Ray, Colour)> {
+        let refraction_ratio = if hit_record.front_face() {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
+        };
+
+        let refracted_ray = ray.interact(&hit_record, refraction_ratio);
+
+        Some((refracted_ray, Colour::new(1.0, 1.0, 1.0)))
     }
 }
