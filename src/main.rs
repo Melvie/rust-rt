@@ -40,7 +40,7 @@ fn main() {
 
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(-1.0, 0.0, -1.0),
-        0.5,
+        -0.4,
         material_left,
     )));
 
