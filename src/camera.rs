@@ -25,7 +25,6 @@ impl<T: Copy> Viewport<T> {
 pub struct Camera<T> {
     aspect_ratio: T,
     viewport: Viewport<T>,
-    focal_length: T,
     origin: Point3D,
     lower_left_corner: Point3D,
     horizontal: Vec3<T>,
@@ -53,15 +52,12 @@ impl Camera<f64> {
         let u = up.cross(&w).unit();
         let v = w.cross(&u);
 
-        let focal_length = 1.0;
-
         let horizontal = focus_dist * viewport.width * u;
         let vertical = focus_dist * viewport.height * v;
 
         Camera {
             viewport,
             aspect_ratio,
-            focal_length,
             origin,
             lower_left_corner: origin - horizontal / 2.0 - vertical / 2.0 - w * focus_dist,
             horizontal,
