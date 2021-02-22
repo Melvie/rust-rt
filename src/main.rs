@@ -57,7 +57,22 @@ fn main() {
         material_right,
     )));
 
-    let scene = Scene::new(world, Camera::new(ASPECT_RATIO, 20.0, Point3D::new(-2.0, 2.0, 1.0), Point3D::new(0.0, 0.0, -1.0), Point3D::new(0.0, 1.0, 0.0)));
+    let camera_origin = Point3D::new(3.0, 3.0, 2.0);
+    let camera_target = Point3D::new(0.0, 0.0, -1.0);
+    let focus_dist = (camera_origin - camera_target).length();
+
+    let scene = Scene::new(
+        world,
+        Camera::new(
+            ASPECT_RATIO,
+            20.0,
+            camera_origin,
+            camera_target,
+            Point3D::new(0.0, 1.0, 0.0),
+            2.0,
+            focus_dist,
+        ),
+    );
 
     let bar = ProgressBar::new(SAMPLES_PER_PIXEL as u64);
 
