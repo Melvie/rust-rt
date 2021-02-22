@@ -24,6 +24,7 @@ fn main() {
     let material_ground = Materials::Lambertian(Lambertian::new(Colour::new(0.8, 0.8, 0.0)));
     let material_center = Materials::Lambertian(Lambertian::new(Colour::new(0.1, 0.2, 0.5)));
     let material_left = Materials::Dielectric(Dielectric::new(1.5));
+    let material_left_2 = Materials::Dielectric(Dielectric::new(1.5));
     let material_right = Materials::Metal(Metal::new(Colour::new(0.8, 0.6, 0.2), 0.0));
 
     world.add(Object::Sphere(Sphere::new(
@@ -40,8 +41,14 @@ fn main() {
 
     world.add(Object::Sphere(Sphere::new(
         Point3D::new(-1.0, 0.0, -1.0),
-        -0.4,
+        -0.45,
         material_left,
+    )));
+
+    world.add(Object::Sphere(Sphere::new(
+        Point3D::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left_2,
     )));
 
     world.add(Object::Sphere(Sphere::new(
@@ -50,7 +57,7 @@ fn main() {
         material_right,
     )));
 
-    let scene = Scene::new(world, Camera::new(ASPECT_RATIO, 2.0, 1.0));
+    let scene = Scene::new(world, Camera::new(ASPECT_RATIO, 20.0, Point3D::new(-2.0, 2.0, 1.0), Point3D::new(0.0, 0.0, -1.0), Point3D::new(0.0, 1.0, 0.0)));
 
     let bar = ProgressBar::new(SAMPLES_PER_PIXEL as u64);
 
