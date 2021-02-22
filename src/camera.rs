@@ -32,11 +32,14 @@ pub struct Camera<T> {
 }
 
 impl Camera<f64> {
-    pub fn new(aspect_ratio: f64, viewport_height: f64, focal_length: f64) -> Self {
+    pub fn new(aspect_ratio: f64, vertical_fov: f64) -> Self {
+        let viewport_height = 2.0 * (vertical_fov.to_radians() / 2.0).tan();
         let viewport = Viewport::new(aspect_ratio * viewport_height, viewport_height);
         let horizontal = Vec3::new(viewport.width, 0.0, 0.0);
         let vertical = Vec3::new(0.0, viewport_height, 0.0);
         let origin = Point3D::new(0.0, 0.0, 0.0);
+
+        let focal_length = 1.0;
 
         Camera {
             viewport,
